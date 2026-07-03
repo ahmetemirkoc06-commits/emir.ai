@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>emir.ai - Multi-Model Kontrol</title>
+    <title>emir.ai - Çok Modelli Kontrol</title>
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
         body { background-color: #0b0b0c; color: #e3e3e3; display: flex; height: 100vh; overflow: hidden; }
@@ -12,119 +12,25 @@
         .sidebar { width: 260px; background-color: #131314; border-right: 1px solid #282829; display: flex; flex-direction: column; padding: 15px; }
         .logo { font-size: 20px; font-weight: bold; margin-bottom: 20px; color: #fff; display: flex; align-items: center; gap: 8px; }
         .logo span { font-size: 12px; background: #282829; padding: 2px 6px; border-radius: 4px; color: #aaa; }
-        .new-chat-btn { background-color: #fff; color: #000; border: none; padding: 12px; border-radius: 8px; font-weight: 600; cursor: pointer; font-size: 14px; margin-bottom: 20px; }
+        .new-chat-btn { background-color: #fff; color: #000; border: none; padding: 12px; border-radius: 8px; font-weight: bold; cursor: pointer; text-align: center; margin-bottom: 20px; transition: background 0.2s; }
+        .new-chat-btn:hover { background-color: #e3e3e3; }
         .chat-list { flex: 1; overflow-y: auto; color: #8e8e93; font-size: 14px; }
+        .chat-item { padding: 10px; border-radius: 6px; margin-bottom: 5px; cursor: pointer; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .chat-item.active, .chat-item:hover { background-color: #1e1e1f; color: #fff; }
 
         /* Ana Sohbet Alanı */
-        .chat-container { flex: 1; display: flex; flex-direction: column; background-color: #0b0b0c; position: relative; }
-        .chat-messages { flex: 1; padding: 40px; overflow-y: auto; display: flex; flex-direction: column; gap: 20px; max-width: 800px; width: 100%; margin: 0 auto; }
-        .welcome-msg { margin-top: auto; margin-bottom: auto; text-align: center; color: #8e8e93; }
+        .main-content { flex: 1; display: flex; flex-direction: column; background-color: #131314; }
+        .chat-container { flex: 1; overflow-y: auto; padding: 30px 10%; display: flex; flex-direction: column; gap: 20px; }
         
-        /* Giriş Kutusu */
-        .input-container { padding: 20px; max-width: 800px; width: 100%; margin: 0 auto; position: relative; }
-        .input-box { width: 100%; background-color: #1e1e1f; border: 1px solid #2f2f30; border-radius: 16px; padding: 16px; color: #fff; font-size: 16px; outline: none; resize: none; height: 56px; }
-        
-        /* Sağ Menü / Hazır Şablonlar */
-        .templates-sidebar { width: 320px; background-color: #0b0b0c; border-left: 1px solid #282829; padding: 20px; overflow-y: auto; }
-        .section-title { font-size: 12px; color: #8e8e93; font-weight: bold; letter-spacing: 1px; margin-bottom: 15px; text-transform: uppercase; }
-        .template-card { background-color: #131314; border: 1px solid #232324; border-radius: 12px; padding: 15px; margin-bottom: 12px; cursor: pointer; transition: 0.2s; }
-        .template-card:hover { background-color: #1e1e1f; border-color: #3e3e3f; }
-        .card-tag { font-size: 10px; font-weight: bold; color: #8e8e93; margin-bottom: 5px; text-transform: uppercase; }
-        .card-text { font-size: 13px; color: #e3e3e3; line-height: 1.4; }
-    </style>
-</head>
-<body>
+        /* Mesaj Balonları */
+        .message { display: flex; flex-direction: column; max-width: 85%; animation: fadeIn 0.3s ease; }
+        .message.user { align-self: flex-end; align-items: flex-end; }
+        .message.bot { align-self: flex-start; align-items: flex-start; }
+        .message .sender { font-size: 12px; color: #8e8e93; margin-bottom: 4px; font-weight: bold; }
+        .message .text { padding: 12px 16px; border-radius: 12px; font-size: 15px; line-height: 1.5; word-break: break-word; }
+        .message.user .text { background-color: #2b2b2c; color: #fff; border-bottom-right-radius: 2px; }
+        .message.bot .text { background-color: #1e1e1f; color: #e3e3e3; border-bottom-left-radius: 2px; border: 1px solid #282829; }
 
-    <div class="sidebar">
-        <div class="logo">emir.ai <span>MULTI-MODEL</span></div>
-        <button class="new-chat-btn" onclick="clearChat()">+ Yeni Sohbet</button>
-        <div class="section-title">Sohbetler</div>
-        <div class="chat-list" id="chatList">Henüz sohbet yok.</div>
-    </div>
-
-    <div class="chat-container">
-        <div class="chat-messages" id="chatMessages">
-            <div class="welcome-msg" id="welcomeMsg">
-                <h2>emir.ai asistanına hoş geldin!</h2>
-                <p style="margin-top: 10px;">Sağ taraftaki hazır komutlardan birine tıklayabilir veya aşağıdan yazmaya başlayabilirsin.</p>
-            </div>
-        </div>
-        <div class="input-container">
-            <input type="text" class="input-box" id="userInput" placeholder="Message emir.ai..." onkeydown="if(event.key === 'Enter') sendMessage()">
-        </div>
-    </div>
-
-    <div class="templates-sidebar">
-        <div class="section-title">5 Model Çevrimiçi</div>
-        
-        <div class="template-card" onclick="useTemplate('Bugün için 5 dakikada yapılacak akşam yemeği önerir misin?')">
-            <div class="card-tag" style="color: #ffb74d;">Gündelik</div>
-            <div class="card-text">Bugün için 5 dakikada yapılacak akşam yemeği önerir misin?</div>
-        </div>
-
-        <div class="template-card" onclick="useTemplate('React\'te debounce hook yaz.')">
-            <div class="card-tag" style="color: #64b5f6;">Kod Yazma</div>
-            <div class="card-text">React'te debounce hook yaz.</div>
-        </div>
-
-        <div class="template-card" onclick="useTemplate('Elektrikli araçların 2030 senaryosunu detaylı analiz et.')">
-            <div class="card-tag" style="color: #ba68c8;">Uzun Analiz</div>
-            <div class="card-text">Elektrikli araçların 2030 senaryosunu detaylı analiz et.</div>
-        </div>
-
-        <div class="template-card" onclick="useTemplate('Neon renkli bir kuantum kedi görseli üret.')">
-            <div class="card-tag" style="color: #4db6ac;">Görsel</div>
-            <div class="card-text">Neon renkli bir kuantum kedi görseli üret.</div>
-        </div>
-
-        <div class="template-card" onclick="useTemplate('Yapay zeka ve eğitim üzerine 6 slaytlık sunum hazırla.')">
-            <div class="card-tag" style="color: #e57373;">Slayt</div>
-            <div class="card-text">Yapay zeka ve eğitim üzerine 6 slaytlık sunum hazırla.</div>
-        </div>
-    </div>
-
-    <script>
-        function sendMessage() {
-            const input = document.getElementById('userInput');
-            const text = input.value.trim();
-            if (!text) return;
-
-            const chatMessages = document.getElementById('chatMessages');
-            const welcomeMsg = document.getElementById('welcomeMsg');
-            if (welcomeMsg) welcomeMsg.remove();
-
-            // Kullanıcı mesajı ekle
-            chatMessages.innerHTML += `<div style="align-self: flex-end; background: #2f2f30; padding: 12px 16px; border-radius: 12px; max-width: 70%; font-size: 15px;">${text}</div>`;
-            
-            input.value = '';
-            chatMessages.scrollTop = chatMessages.scrollHeight;
-
-            // Yapay zeka emir.ai cevabı
-            setTimeout(() => {
-                let aiResponse = "Ben **emir.ai**, senin için en iyi yapay zeka modelini seçen akıllı bir orkestratörüm! İstediğin görevi başarıyla aldım.";
-                
-                // Eğer kullanıcı kim olduğunu sorduysa özel cevap ver
-                const lowerText = text.toLowerCase();
-                if (lowerText.includes("kimsin") || lowerText.includes("adın ne") || lowerText.includes("sen kimsini")) {
-                    aiResponse = "Ben **emir.ai**! Her iş için en iyi olan yapay zekayı seçip kullanan akıllı bir Multi-Model Kontrol sistemiyim.";
-                }
-
-                chatMessages.innerHTML += `<div style="align-self: flex-start; background: #131314; border: 1px solid #232324; padding: 12px 16px; border-radius: 12px; max-width: 70%; font-size: 15px; color: #e3e3e3;"><strong>emir.ai:</strong><br>${aiResponse}</div>`;
-                chatMessages.scrollTop = chatMessages.scrollHeight;
-                document.getElementById('chatList').innerHTML = "• Son Sohbet";
-            }, 800);
-        }
-
-        function useTemplate(text) {
-            document.getElementById('userInput').value = text;
-            sendMessage();
-        }
-
-        function clearChat() {
-            document.getElementById('chatMessages').innerHTML = `<div class="welcome-msg" id="welcomeMsg"><h2>emir.ai asistanına hoş geldin!</h2><p style="margin-top: 10px;">Sağ taraftaki hazır komutlardan birine tıklayabilir veya aşağıdan yazmaya başlayabilirsin.</p></div>`;
-            document.getElementById('chatList').innerHTML = "Henüz sohbet yok.";
-        }
-    </script>
-</body>
-</html>
+        /* Giriş Alanı */
+        .input-container { padding: 20px 10%; background-color: #131314; border-top: 1px solid #282829; display: flex
 
