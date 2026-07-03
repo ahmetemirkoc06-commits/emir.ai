@@ -43,32 +43,82 @@
     <script>
         const chatContainer = document.getElementById('chatContainer');
         const userInput = document.getElementById('userInput');
+
+        function generateSmartReply(msg) {
+            const text = msg.toLowerCase();
+            
+            if (text.includes('kedi') && text.includes('çiz')) {
+                return "İşte senin için çizdiğim sevimli kedi! 🐾<br><br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;/\\_/\\<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;( o.o )<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&gt; ^ &lt;<br><br>Nasıl olmuş? Başka bir şey çizmemi ister misin?";
+            }
+            if (text.includes('kedi')) {
+                return "Kediler harika canlılardır! Miyav! 🐱 Sana kediler hakkında ilginç bir bilgi vereyim mi, yoksa bir kedi resmi mi çizmemi istersin?";
+            }
+            if (text.includes('selam') || text.includes('merhaba')) {
+                return "Merhaba! Ben **emir.ai**. Bugün senin için hangi yapay zeka modelini devreye sokmamı istersin? Harika işler yapmaya hazırım! 🚀";
+            }
+            if (text.includes('nasılsın')) {
+                return "Çok iyiyim, teşekkürler! Arka planda yüzlerce yapay zeka modelini kontrol edip emirlerini bekliyorum. Sen nasılsın?";
+            }
+            if (text.includes('oyun') || text.includes('pubg') || text.includes('cuphead')) {
+                return "Oyun modu aktif! 🎮 Harika bir oyun seçimi. Strateji mi geliştirmek istersin, yoksa oyun içi teknik bir konuda yardıma mı ihtiyacın var?";
+            }
+            if (text.includes('ödev') || text.includes('ders') || text.includes('ataturk') || text.includes('atatürk')) {
+                return "Eğitim ve Araştırma Modu Devrede! 📚 Konuyu analiz ettim. Ödevin veya sunumun için en doğru ve özet bilgileri hazırlayabilirim. Tam olarak neyi araştırmamı istersin?";
+            }
+            if (text.includes('kod') || text.includes('html') || text.includes('yazılım')) {
+                return "Kod Analiz Modu Aktif! 💻 Kodlarında bir hata mı var, yoksa yepyeni bir özellik mi eklemek istiyorsun? Bana kodu gönder, hemen inceleyeyim!";
+            }
+            if (text.includes('hava')) {
+                return "Hava durumu modülü kontrol ediliyor... Şu an bulunduğun yerde teknoloji üretmek ve kod yazmak için hava fazlasıyla müsait görünüyor! ☀️⚡";
+            }
+            
+            // Genel cevap havuzu (Eğer yukarıdakilerden biri değilse rastgele akıllı cevap verir)
+            const defaultReplies = [
+                "İstediğin görevi başarıyla aldım! Arka plandaki en güçlü modeli seçip bu soruyu analiz ettim. Harika bir fikir!",
+                "Sorgun emir.ai orkestratörü tarafından işlendi. Bu konuda derinlemesine bir araştırma yapmamı ister misin?",
+                "Anlaşıldı! multi-model yapay zeka ağı bu istek için yapılandırıldı. Bana biraz daha detay verebilir misin?"
+            ];
+            return defaultReplies[Math.floor(Math.random() * defaultReplies.length)];
+        }
+
         function sendMessage() {
             const messageText = userInput.value.trim();
             if (messageText === '') return;
+
             appendMessage('Kullanıcı', messageText, 'user');
             userInput.value = '';
+
             setTimeout(() => {
-                const botReply = "Ben <strong>emir.ai</strong>, senin için en iyi yapay zeka modelini seçen akıllı bir Multi-Model Kontrol sistemiyim! İstediğin görevi başarıyla aldım ve en uygun modele yönlendirerek tamamladım.";
+                const botReply = generateSmartReply(messageText);
                 appendMessage('emir.ai', botReply, 'bot');
-            }, 400);
+            }, 500);
         }
+
         function appendMessage(sender, text, type) {
             const messageDiv = document.createElement('div');
             messageDiv.className = `message ${type}`;
+
             const senderDiv = document.createElement('div');
             senderDiv.className = 'sender';
             senderDiv.innerText = sender + ':';
+
             const textDiv = document.createElement('div');
             textDiv.className = 'text';
-            textDiv.innerHTML = text;
+            
+            // Kalın yazıları formatlama
+            let formattedText = text.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+            textDiv.innerHTML = formattedText;
+
             messageDiv.appendChild(senderDiv);
             messageDiv.appendChild(textDiv);
             chatContainer.appendChild(messageDiv);
+
             chatContainer.scrollTop = chatContainer.scrollHeight;
         }
+
         function handleKeyPress(event) { if (event.key === 'Enter') { sendMessage(); } }
         function clearChat() { chatContainer.innerHTML = `<div class="message bot"><div class="sender">emir.ai:</div><div class="text">Ben <strong>emir.ai</strong>! Her iş için en iyi olan yapay zekayı seçip kullanan akıllı bir Multi-Model Kontrol sistemiyim. Size nasıl yardımcı olabilirim?</div></div>`; }
     </script>
 </body>
 </html>
+
